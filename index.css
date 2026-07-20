@@ -1,0 +1,349 @@
+@import "tailwindcss";
+@config "./tailwind.config.js";
+
+/* GESCO Global Stylesheet overrides */
+
+html {
+  font-size: 13.5px;
+}
+
+@media (min-width: 640px) {
+  html {
+    font-size: clamp(12px, 0.75vw + 8.5px, 14.5px);
+  }
+}
+
+@media (min-width: 1024px) {
+  html {
+    font-size: clamp(13px, 0.85vw + 5.5px, 17px);
+  }
+}
+
+@media (min-width: 1440px) {
+  html {
+    font-size: clamp(14.5px, 0.95vw + 4px, 20px);
+  }
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 400;
+  overflow-x: hidden;
+}
+
+/* Fluid scale overrides for Lucide Icons to preserve proportions */
+svg.lucide[width="12"], svg[width="12"].lucide { width: 0.857rem !important; height: 0.857rem !important; }
+svg.lucide[width="14"], svg[width="14"].lucide { width: 1rem !important; height: 1rem !important; }
+svg.lucide[width="16"], svg[width="16"].lucide { width: 1.143rem !important; height: 1.143rem !important; }
+svg.lucide[width="18"], svg[width="18"].lucide { width: 1.286rem !important; height: 1.286rem !important; }
+svg.lucide[width="20"], svg[width="20"].lucide { width: 1.429rem !important; height: 1.429rem !important; }
+svg.lucide[width="24"], svg[width="24"].lucide { width: 1.714rem !important; height: 1.714rem !important; }
+svg.lucide[width="28"], svg[width="28"].lucide { width: 2rem !important; height: 2rem !important; }
+svg.lucide[width="32"], svg[width="32"].lucide { width: 2.286rem !important; height: 2.286rem !important; }
+svg.lucide[width="36"], svg[width="36"].lucide { width: 2.571rem !important; height: 2.571rem !important; }
+svg.lucide[width="40"], svg[width="40"].lucide { width: 2.857rem !important; height: 2.857rem !important; }
+svg.lucide[width="48"], svg[width="48"].lucide { width: 3.429rem !important; height: 3.429rem !important; }
+svg.lucide[width="56"], svg[width="56"].lucide { width: 4rem !important; height: 4rem !important; }
+svg.lucide[width="64"], svg[width="64"].lucide { width: 4.571rem !important; height: 4.571rem !important; }
+svg.lucide[width="72"], svg[width="72"].lucide { width: 5.143rem !important; height: 5.143rem !important; }
+svg.lucide[width="80"], svg[width="80"].lucide { width: 5.714rem !important; height: 5.714rem !important; }
+svg.lucide[width="96"], svg[width="96"].lucide { width: 6.857rem !important; height: 6.857rem !important; }
+
+
+/* Uniform readable font-size scales to replace microscopic texts, using fluid rem */
+.text-\[8px\], .text-\[9px\] {
+  font-size: 0.785rem !important;
+}
+
+.text-\[10px\], .text-xs {
+  font-size: 0.893rem !important;
+}
+
+.text-sm {
+  font-size: 1rem !important;
+}
+
+.text-base {
+  font-size: 1.107rem !important;
+}
+
+/* Light font weights overrides for a sleeker SaaS UI */
+.font-black, .font-extrabold {
+  font-weight: 600 !important; /* Semi-bold maximum for titles */
+}
+
+.font-bold {
+  font-weight: 500 !important; /* Bold shifts to Medium */
+}
+
+.font-semibold {
+  font-weight: 500 !important; /* Semibold shifts to Medium */
+}
+
+.font-medium {
+  font-weight: 400 !important; /* Medium shifts to Regular */
+}
+
+.font-normal {
+  font-weight: 300 !important; /* Normal shifts to Light */
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600 !important;
+}
+
+/* Global modern scrollbar styling for all scrollable containers */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    rgba(99,102,241,0.8),
+    rgba(139,92,246,0.8)
+  );
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    180deg,
+    rgba(99,102,241,1),
+    rgba(139,92,246,1)
+  );
+}
+
+/* Standard properties for Firefox/cross-platform compatibility */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(124, 58, 237, 0.7) transparent;
+}
+
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Glassmorphism utility */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.dark .glass-panel {
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Sidebar responsiveness based on viewport height (vertical responsive) */
+@media (max-height: 750px) {
+  .sidebar-logo-wrapper {
+    display: none !important;
+  }
+  .sidebar-profile-wrapper {
+    display: none !important;
+  }
+  .sidebar-nav-btn {
+    padding-top: 0.3rem !important;
+    padding-bottom: 0.3rem !important;
+    font-size: 0.785rem !important;
+  }
+  .sidebar-nav-btn svg {
+    width: 1rem !important;
+    height: 1rem !important;
+  }
+  .sidebar-logout-container {
+    padding: 0.25rem !important;
+  }
+  .sidebar-logout-container button {
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+    font-size: 0.785rem !important;
+  }
+  .sidebar-logout-container button svg {
+    width: 1rem !important;
+    height: 1rem !important;
+  }
+}
+
+@media (max-height: 580px) {
+  .sidebar-nav-btn {
+    padding-top: 0.2rem !important;
+    padding-bottom: 0.2rem !important;
+    font-size: 0.714rem !important;
+  }
+  .sidebar-nav-btn svg {
+    width: 0.857rem !important;
+    height: 0.857rem !important;
+  }
+  .sidebar-logout-container {
+    padding: 0.2rem !important;
+  }
+  .sidebar-logout-container button {
+    padding-top: 0.2rem !important;
+    padding-bottom: 0.2rem !important;
+    font-size: 0.714rem !important;
+  }
+  .sidebar-logout-container button svg {
+    width: 0.857rem !important;
+    height: 0.857rem !important;
+  }
+}
+
+/* Premium Colorful Card Designs with abstract wavy lines & glassmorphism details */
+.card-premium-pattern {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background-size: cover;
+  background-position: center;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.card-premium-pattern::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 200' width='100%25' height='100%25'%3E%3Cpath d='M-50,150 Q100,50 250,150 T550,50' fill='none' stroke='rgba(255,255,255,0.12)' stroke-width='2'/%3E%3Cpath d='M-50,170 Q120,70 270,170 T570,70' fill='none' stroke='rgba(255,255,255,0.08)' stroke-width='1.5'/%3E%3Cpath d='M-50,130 Q80,30 230,130 T530,30' fill='none' stroke='rgba(255,255,255,0.05)' stroke-width='3'/%3E%3Ccircle cx='340' cy='60' r='80' fill='rgba(255,255,255,0.08)'/%3E%3Ccircle cx='360' cy='80' r='50' fill='rgba(255,255,255,0.05)'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: cover;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.card-premium-pattern:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.card-premium-green {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+}
+
+.card-premium-blue {
+  background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+}
+
+.card-premium-purple {
+  background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
+}
+
+.card-premium-orange {
+  background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+}
+
+.card-premium-rose {
+  background: linear-gradient(135deg, #EC4899 0%, #BE185D 100%);
+}
+
+.card-premium-indigo {
+  background: linear-gradient(135deg, #6366F1 0%, #4338CA 100%);
+}
+
+.card-premium-cyan {
+  background: linear-gradient(135deg, #06B6D4 0%, #0891B2 100%);
+}
+
+/* Ensure inside text matches */
+.card-premium-pattern p,
+.card-premium-pattern h3,
+.card-premium-pattern span,
+.card-premium-pattern div {
+  color: rgba(255, 255, 255, 0.95) !important;
+  z-index: 2;
+  position: relative;
+}
+
+.card-premium-pattern .text-slate-400,
+.card-premium-pattern .text-slate-450,
+.card-premium-pattern .text-zinc-500,
+.card-premium-pattern .text-zinc-400 {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.card-premium-pattern .bg-slate-50,
+.card-premium-pattern .bg-zinc-950 {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  color: #ffffff !important;
+}
+
+/* Global responsive modals constraint to prevent clipping on small screen heights */
+.fixed.inset-0 > div {
+  max-height: calc(100vh - 2rem) !important;
+  overflow-y: auto !important;
+}
+
+/* ── PRINT OVERRIDES ── */
+@media print {
+  /* Hide the entire viewport contents by default */
+  body * {
+    visibility: hidden;
+  }
+  
+  /* Make only the print-area element and its children visible */
+  .print-area, .print-area * {
+    visibility: visible;
+  }
+  
+  /* Positions the print-area element at the top-left of the page */
+  .print-area {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 20px !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: white !important;
+    color: black !important;
+    z-index: 9999 !important;
+  }
+
+  /* Make sure background colors and images are printed exactly as they are on screen */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide sidebar, navigation, layout headers, action buttons, overlays, modal backgrounds, and top mobile bar */
+  .no-print,
+  aside,
+  nav,
+  header,
+  button,
+  .sidebar-logo-wrapper,
+  .sidebar-profile-wrapper,
+  .sidebar-logout-container,
+  .fixed.inset-0,
+  #root > div > div:first-child,
+  header + div,
+  .no-print * {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    width: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+}

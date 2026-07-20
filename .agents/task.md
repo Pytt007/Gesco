@@ -1,0 +1,30 @@
+# Tasks — Corrections Audit P1/P2/P3
+
+- `[x]` **Phase 1** — Hook `useLocalStorage` centralisé
+  - `[x]` Créer `hooks/useLocalStorage.ts`
+  - `[x]` Modifier `App.tsx` — import centralisé
+  - `[x]` Modifier `Canteen.tsx` — import centralisé
+  - `[x]` Modifier `Expenses.tsx` — import centralisé
+  - `[x]` Modifier `Transport.tsx` — import centralisé
+- `[x]` **Phase 2** — Remplacement `xlsx` → `@e965/xlsx`
+  - `[x]` Installer `@e965/xlsx`, désinstaller `xlsx`
+  - `[x]` Mettre à jour les 7 imports composants
+- `[x]` **Phase 3** — `ErrorBoundary` React
+  - `[x]` Créer `components/ErrorBoundary.tsx`
+  - `[x]` Intégrer dans `index.tsx`
+- `[x]` **Phase 4** — Code Splitting Vite
+  - `[x]` Configurer `manualChunks` dans `vite.config.ts`
+- `[x]` **Phase 5** — Typage TypeScript strict
+  - `[x]` Corriger `any` dans `Students.tsx`
+  - `[x]` Corriger `any` dans `App.tsx`
+- `[x]` **Phase 6** — PWA & Service Worker
+  - `[x]` Installer `vite-plugin-pwa`
+  - `[x]` Configurer `vite.config.ts`
+- `[x]` **Phase 7** — Pagination des tableaux
+  - `[x]` Pagination `Students.tsx` (20/page)
+  - `[x]` Pagination `History.tsx` (50/page)
+- `[x]` **Phase 8** — Tests Automatisés Vitest
+  - `[x]` Créer `vitest.config.ts`
+  - `[x]` Créer `tests/useLocalStorage.test.ts`
+  - `[x]` Créer `tests/finance.test.ts`
+- `[x]` **Validation finale** — `npm run build` + `npm test`
