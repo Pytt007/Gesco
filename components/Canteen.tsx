@@ -31,7 +31,7 @@ import {
 } from 'lucide-react';
 import * as XLSX from '@e965/xlsx';
 import { CanteenMenu, Student, NotificationType, Transaction } from '../types';
-import useLocalStorage from '../hooks/useLocalStorage';
+
 
 const getDayName = (date: Date): string => {
     const days = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
@@ -334,7 +334,7 @@ const Canteen: React.FC<CanteenProps> = ({
     };
 
     // Configurations de cantine (Supabase avec fallback LocalStorage)
-    const [localCanteenConfigs, setLocalCanteenConfigs] = useLocalStorage<CanteenFeeConfig[]>('canteen_fee_configs_' + schoolYear, DEFAULT_FEE_CONFIGS);
+    const [localCanteenConfigs, setLocalCanteenConfigs] = useState<CanteenFeeConfig[]>(DEFAULT_FEE_CONFIGS);
     const canteenConfigs = propsCanteenConfigs ?? localCanteenConfigs;
     const setCanteenConfigs = propsSetCanteenConfigs ?? setLocalCanteenConfigs;
 
@@ -368,7 +368,7 @@ const Canteen: React.FC<CanteenProps> = ({
     const DEFAULT_STOCK_ITEMS: StockItem[] = [];
 
     // Stocks de cantine (Supabase avec fallback LocalStorage)
-    const [localStockItems, setLocalStockItems] = useLocalStorage<StockItem[]>('canteen_stock_items_' + schoolYear, DEFAULT_STOCK_ITEMS);
+    const [localStockItems, setLocalStockItems] = useState<StockItem[]>(DEFAULT_STOCK_ITEMS);
     const stockItems = propsStockItems ?? localStockItems;
     const setStockItems = propsSetStockItems ?? setLocalStockItems;
 
@@ -383,7 +383,7 @@ const Canteen: React.FC<CanteenProps> = ({
     });
 
     // Dépenses de cantine (Supabase avec fallback LocalStorage)
-    const [localCanteenExpenses, setLocalCanteenExpenses] = useLocalStorage<CanteenExpense[]>('canteen_expenses_' + schoolYear, []);
+    const [localCanteenExpenses, setLocalCanteenExpenses] = useState<CanteenExpense[]>([]);
     const canteenExpenses = propsCanteenExpenses ?? localCanteenExpenses;
     const setCanteenExpenses = propsSetCanteenExpenses ?? setLocalCanteenExpenses;
     const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
@@ -394,7 +394,7 @@ const Canteen: React.FC<CanteenProps> = ({
         description: ''
     });
 
-    const [dishesLibrary, setDishesLibrary] = useLocalStorage<{ name: string; type: string; label: string }[]>('canteen_dishes_library', [
+    const [dishesLibrary, setDishesLibrary] = useState<{ name: string; type: string; label: string }[]>([
         { name: "Riz Sauce Tomate", type: "main", label: "Plat Principal" },
         { name: "Poulet Yassa", type: "main", label: "Plat Principal" },
         { name: "Ragoût de Bœuf", type: "main", label: "Plat Principal" },

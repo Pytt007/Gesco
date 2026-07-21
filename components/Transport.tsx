@@ -29,7 +29,7 @@ import {
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import * as XLSX from '@e965/xlsx';
 import { BusRoute, Student, TransportSubscription, NotificationType, Transaction } from '../types';
-import useLocalStorage from '../hooks/useLocalStorage';
+
 
 // --- TYPES ---
 
@@ -265,7 +265,7 @@ const Transport: React.FC<TransportProps> = ({
   };
 
   // Dépenses de la flotte (Supabase avec fallback LocalStorage)
-  const [localBusExpenses, setLocalBusExpenses] = useLocalStorage<BusExpense[]>('bus_expenses_' + schoolYear, []);
+  const [localBusExpenses, setLocalBusExpenses] = useState<BusExpense[]>([]);
   const busExpenses = propsBusExpenses ?? localBusExpenses;
   const setBusExpenses = propsSetBusExpenses ?? setLocalBusExpenses;
 
@@ -330,7 +330,7 @@ const Transport: React.FC<TransportProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Configurations de transport (Supabase avec fallback LocalStorage)
-  const [localConfigs, setLocalConfigs] = useLocalStorage<TransportFeeConfig[]>('transport_fee_configs_' + schoolYear, DEFAULT_TRANSPORT_CONFIGS);
+  const [localConfigs, setLocalConfigs] = useState<TransportFeeConfig[]>(DEFAULT_TRANSPORT_CONFIGS);
   const configs = propsConfigs ?? localConfigs;
   const setConfigs = propsSetConfigs ?? setLocalConfigs;
 

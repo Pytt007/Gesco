@@ -79,6 +79,7 @@ CREATE TABLE IF NOT EXISTS public.school_settings (
   email           TEXT DEFAULT '',
   phone           TEXT DEFAULT '',
   address         TEXT DEFAULT '',
+  current_school_year TEXT DEFAULT '2024-2025',
   role_permissions JSONB DEFAULT '{}',
   created_at      TIMESTAMPTZ DEFAULT NOW(),
   updated_at      TIMESTAMPTZ DEFAULT NOW()

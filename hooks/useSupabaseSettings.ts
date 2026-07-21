@@ -49,6 +49,7 @@ function useSupabaseSettings(): [
           email: row.email || '',
           phone: row.phone || '',
           address: row.address || '',
+          currentSchoolYear: row.current_school_year || '2024-2025',
         });
       }
       // Si aucune ligne, les valeurs par défaut restent
@@ -93,6 +94,7 @@ function useSupabaseSettings(): [
         email: data.email,
         phone: data.phone,
         address: data.address,
+        current_school_year: data.currentSchoolYear || '2024-2025',
         updated_at: new Date().toISOString(),
       };
 

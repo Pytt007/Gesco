@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
-import useLocalStorage from './hooks/useLocalStorage';
+
 import useSupabaseTable from './hooks/useSupabaseTable';
 import useSupabaseSettings from './hooks/useSupabaseSettings';
 import useSupabaseAuth from './hooks/useSupabaseAuth';
@@ -55,8 +55,8 @@ const DEFAULT_ROLE_PERMISSIONS: Record<string, string[]> = {
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewState>(ViewState.DASHBOARD);
   // Préférences légères conservées dans localStorage (pas de données métier)
-  const [isDarkMode, setIsDarkMode] = useLocalStorage<boolean>('theme_dark_mode', false);
-  const [schoolYear, setSchoolYear] = useLocalStorage<string>('school_year', '2024-2025');
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+  const [schoolYear, setSchoolYearState] = useState<string>('2024-2025');
   const [scolarityFilter, setScolarityFilter] = useState<'all' | 'late' | 'paid'>('all');
 
   // ─── Auth Supabase ────────────────────────────────────────────────────────
@@ -99,6 +99,21 @@ const App: React.FC = () => {
 
   // ─── Paramètres de l'école (Supabase — ligne unique) ─────────────────────
   const [schoolSettings, setSchoolSettings, _settingsLoading] = useSupabaseSettings();
+
+  // Synchroniser l'année scolaire active depuis Supabase en temps réel
+  useEffect(() => {
+    if (schoolSettings.currentSchoolYear) {
+      setSchoolYearState(schoolSettings.currentSchoolYear);
+    }
+  }, [schoolSettings.currentSchoolYear]);
+
+  const setSchoolYear = async (newYear: string) => {
+    setSchoolYearState(newYear);
+    await setSchoolSettings({
+      ...schoolSettings,
+      currentSchoolYear: newYear
+    });
+  };
 
   // ─── Collections de données — Supabase (par année scolaire) ─────────────
 
@@ -203,7 +218,7 @@ const App: React.FC = () => {
     setHistoryLogs(prev => [newLog, ...prev]);
   };
 
-  // Initialiser le dark mode depuis localStorage
+  // Gérer l'état du dark mode
   useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
@@ -358,6 +373,7 @@ const App: React.FC = () => {
           feeRecords={feeRecords}
           addLog={addLog}
           schoolYear={schoolYear}
+          setSchoolYear={setSchoolYear}
           entries={schoolExpenses}
           setEntries={setSchoolExpenses}
           budgets={schoolBudgets}

@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
     Plus,
     Download,
@@ -30,7 +30,7 @@ import {
 } from 'lucide-react';
 import { NotificationType, Transaction, Student, SchoolFeeRecord } from '../types';
 import * as XLSX from '@e965/xlsx';
-import useLocalStorage from '../hooks/useLocalStorage';
+
 import {
   AreaChart,
   Area,
@@ -85,6 +85,7 @@ interface ExpensesProps {
     feeRecords?: SchoolFeeRecord[];
     addLog?: (action: string, details: string, module: any, type?: string, oldValue?: string, newValue?: string) => void;
     schoolYear?: string;
+    setSchoolYear?: (year: string) => void;
     entries?: ExpenseEntry[];
     setEntries?: React.Dispatch<React.SetStateAction<ExpenseEntry[]>>;
     budgets?: any[];
@@ -138,6 +139,16 @@ const getCurrentMonthIdx = (startYear: number): number => {
     return idx >= 0 ? idx : 0;
 };
 
+/** Extrait l'année de début d'une chaîne d'année scolaire (ex: '2024-2025' -> 2024) */
+const getYearFromSchoolYear = (sy: string): number => {
+    const parts = sy.split('-');
+    if (parts.length > 0) {
+        const y = parseInt(parts[0]);
+        if (!isNaN(y)) return y;
+    }
+    return getCurrentSchoolYearStart();
+};
+
 // ─── Initial sample data ──────────────────────────────────────────────────────
 // Données d'exemple sur plusieurs années scolaires pour démonstration
 
@@ -161,6 +172,7 @@ const Expenses: React.FC<ExpensesProps> = ({
     feeRecords = [],
     addLog,
     schoolYear,
+    setSchoolYear,
     entries: propsEntries,
     setEntries: propsSetEntries,
     budgets: propsBudgets,
@@ -170,31 +182,46 @@ const Expenses: React.FC<ExpensesProps> = ({
     const syKey = schoolYear || '2024-2025';
 
     // ── Data (Supabase avec fallback LocalStorage)
-    const [localEntries, setLocalEntries] = useLocalStorage<ExpenseEntry[]>('school_expenses_' + syKey, INITIAL_ENTRIES);
+    const [localEntries, setLocalEntries] = useState<ExpenseEntry[]>(INITIAL_ENTRIES);
     const entries = propsEntries ?? localEntries;
     const setEntries = propsSetEntries ?? setLocalEntries;
 
     // ── School year navigation
     const currentSY = getCurrentSchoolYearStart();
+    const initialSY = schoolYear ? getYearFromSchoolYear(schoolYear) : currentSY;
     const availableYears = useMemo(
         () => Array.from({ length: 6 }, (_, i) => currentSY - 5 + i + 1),
         [currentSY]
     );
-    const [selectedSY, setSelectedSY] = useState<number>(currentSY);
+    const [selectedSY, setSelectedSY] = useState<number>(initialSY);
 
     // Months of selected school year
     const schoolYearMonths = useMemo(() => getSchoolYearMonths(selectedSY), [selectedSY]);
 
     // ── Month navigation (within selected school year)
-    const [selectedMonthIdx, setSelectedMonthIdx] = useState<number>(() => getCurrentMonthIdx(currentSY));
+    const [selectedMonthIdx, setSelectedMonthIdx] = useState<number>(() => getCurrentMonthIdx(initialSY));
+
+    // Synchronize local year with global schoolYear when it changes
+    useEffect(() => {
+        if (schoolYear) {
+            const yr = getYearFromSchoolYear(schoolYear);
+            setSelectedSY(yr);
+            setSelectedMonthIdx(getCurrentMonthIdx(yr));
+        }
+    }, [schoolYear]);
 
     const handleChangeSY = (year: number) => {
-        setSelectedSY(year);
-        setSelectedDay(null);
-        if (year === currentSY) {
-            setSelectedMonthIdx(getCurrentMonthIdx(currentSY));
+        const nextSchoolYearStr = `${year}-${year + 1}`;
+        if (setSchoolYear) {
+            setSchoolYear(nextSchoolYearStr);
         } else {
-            setSelectedMonthIdx(0);
+            setSelectedSY(year);
+            setSelectedDay(null);
+            if (year === currentSY) {
+                setSelectedMonthIdx(getCurrentMonthIdx(currentSY));
+            } else {
+                setSelectedMonthIdx(0);
+            }
         }
     };
 
@@ -205,7 +232,7 @@ const Expenses: React.FC<ExpensesProps> = ({
     const [selectedDay, setSelectedDay] = useState<number | null>(null);
     const [annualViewMode, setAnnualViewMode] = useState<'chart' | 'table'>('chart');
     const DEFAULT_BUDGETS: Record<number, number> = {};
-    const [localBudgets, setLocalBudgets] = useLocalStorage<Record<number, number>>('school_budgets', DEFAULT_BUDGETS);
+    const [localBudgets, setLocalBudgets] = useState<Record<number, number>>(DEFAULT_BUDGETS);
 
     const budgets = useMemo(() => {
         if (!propsBudgets) return localBudgets;

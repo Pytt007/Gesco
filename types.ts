@@ -120,6 +120,7 @@ export interface SchoolSettingsData {
   email: string;
   phone: string;
   address: string;
+  currentSchoolYear?: string;
 }
 
 export interface Student {
