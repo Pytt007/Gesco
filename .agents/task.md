@@ -27,4 +27,6 @@
   - `[x]` Créer `vitest.config.ts`
   - `[x]` Créer `tests/useLocalStorage.test.ts`
   - `[x]` Créer `tests/finance.test.ts`
+- `[x]` **Phase 9** — Documentation de production
+  - `[x]` Documenter l'intégration Supabase et les étapes d'installation du schéma dans `README.md`
 - `[x]` **Validation finale** — `npm run build` + `npm test`

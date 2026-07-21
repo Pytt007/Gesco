@@ -45,7 +45,9 @@ L'application est construite sur une pile technique robuste et moderne :
 - **Styling :** Tailwind CSS (avec un design system adaptatif fluide personnalisé)
 - **Icônes :** Lucide React (mises à l'échelle proportionnellement avec le texte)
 - **Graphiques :** Recharts
-- **Persistance :** LocalStorage (via un hook réactif personnalisé `useLocalStorage`)
+- **Persistance & Base de Données :** Supabase (PostgreSQL avec support Realtime)
+- **Sécurité :** Row Level Security (RLS) et politiques d'accès configurées par rôle
+- **Stockage :** Supabase Storage (bucket `gesco-assets` pour les logos et avatars)
 - **Tests :** Vitest & Testing Library
 
 ---
@@ -96,8 +98,21 @@ L'application intègre un système d'habilitation basé sur les rôles (RBAC) po
 ### Prérequis
 - [Node.js](https://nodejs.org/) (Version 18 ou supérieure recommandée)
 - npm (installé par défaut avec Node.js)
+- Un compte [Supabase](https://supabase.com)
 
-### Étapes de lancement
+### 💻 Configuration du Backend (Supabase)
+
+Pour initialiser la base de données et l'authentification du SaaS :
+
+1. **Créer un nouveau projet** sur la console [Supabase](https://supabase.com).
+2. **Exécuter le schéma SQL :**
+   - Ouvrez l'**Éditeur SQL** (*SQL Editor*) de votre projet Supabase.
+   - Copiez-collez et exécutez l'intégralité du contenu du fichier [supabase/schema.sql](file:///c:/Users/SUPREME%20COM/Documents/Gesco-main/Gesco-main/supabase/schema.sql). Cela va configurer les tables, les index, le bucket de stockage de médias (`gesco-assets`), l'écoute temps réel (*Realtime*) et les politiques de sécurité par rôle (RLS).
+3. **Configurer les variables d'environnement :**
+   - Créez un fichier `.env.local` à la racine du projet (copiez le modèle de `.env.example`).
+   - Renseignez les variables `VITE_SUPABASE_URL` et `VITE_SUPABASE_ANON_KEY` récupérées dans **Settings > API** de votre tableau de bord Supabase.
+
+### 🚀 Étapes de lancement
 
 1. **Cloner le dépôt et se placer dans le projet :**
    ```bash

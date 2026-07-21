@@ -56,6 +56,10 @@ Voici le détail de toutes les corrections de priorité Majeure, Mineure, et d'A
   - [NEW] [useLocalStorage.test.ts](file:///c:/Users/silve/OneDrive/Bureau/Gesco-main/tests/useLocalStorage.test.ts)
   - [NEW] [finance.test.ts](file:///c:/Users/silve/OneDrive/Bureau/Gesco-main/tests/finance.test.ts)
 
+### 8. Documentation Technique de Supabase
+* **Action :** Mise à jour complète du `README.md` pour documenter la nouvelle architecture backend (Supabase), le déploiement du schéma de base de données PostgreSQL et la configuration des variables d'environnement.
+* **Fichier modifié :** [README.md](file:///c:/Users/SUPREME%20COM/Documents/Gesco-main/Gesco-main/README.md)
+
 ---
 
 ## 🧪 Résultats des Tests et Validation
