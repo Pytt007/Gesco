@@ -482,6 +482,28 @@ CREATE POLICY "history_logs_access" ON public.history_logs FOR ALL USING (
   AND public.get_my_role() = 'ADMIN_GENERALE'
 );
 
+DROP POLICY IF EXISTS "canteen_fee_configs_access" ON public.canteen_fee_configs;
+CREATE POLICY "canteen_fee_configs_access" ON public.canteen_fee_configs FOR ALL USING (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS "canteen_stock_items_access" ON public.canteen_stock_items;
+CREATE POLICY "canteen_stock_items_access" ON public.canteen_stock_items FOR ALL USING (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS "canteen_expenses_access" ON public.canteen_expenses;
+CREATE POLICY "canteen_expenses_access" ON public.canteen_expenses FOR ALL USING (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS "transport_fee_configs_access" ON public.transport_fee_configs;
+CREATE POLICY "transport_fee_configs_access" ON public.transport_fee_configs FOR ALL USING (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS "bus_expenses_access" ON public.bus_expenses;
+CREATE POLICY "bus_expenses_access" ON public.bus_expenses FOR ALL USING (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS "school_expenses_access" ON public.school_expenses;
+CREATE POLICY "school_expenses_access" ON public.school_expenses FOR ALL USING (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS "school_budgets_access" ON public.school_budgets;
+CREATE POLICY "school_budgets_access" ON public.school_budgets FOR ALL USING (auth.role() = 'authenticated');
+
+
 -- ============================================================
 -- STORAGE BUCKET — Logos et images
 -- ============================================================

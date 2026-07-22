@@ -13,14 +13,24 @@ const DEFAULT_SETTINGS: SchoolSettingsData = {
 
 /**
  * Hook pour les paramètres de l'école (ligne unique dans la table school_settings).
- * Reproduit l'API de useLocalStorage<SchoolSettingsData>.
+ * Reproduit l'API de useLocalStorage<SchoolSettingsData> avec sync Supabase.
  */
 function useSupabaseSettings(): [
   SchoolSettingsData,
   (data: SchoolSettingsData) => void,
   boolean
 ] {
-  const [settings, setSettings] = useState<SchoolSettingsData>(DEFAULT_SETTINGS);
+  const localKey = 'gesco_school_settings';
+
+  const getLocalBackup = (): SchoolSettingsData => {
+    try {
+      const saved = localStorage.getItem(localKey);
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return DEFAULT_SETTINGS;
+  };
+
+  const [settings, setSettings] = useState<SchoolSettingsData>(getLocalBackup);
   const [loading, setLoading] = useState(true);
   const [rowId, setRowId] = useState<string | null>(null);
 
@@ -30,30 +40,41 @@ function useSupabaseSettings(): [
 
     const fetchSettings = async () => {
       setLoading(true);
-      const { data: rows, error } = await supabase
-        .from('school_settings')
-        .select('*')
-        .limit(1);
+      try {
+        const { data: rows, error } = await supabase
+          .from('school_settings')
+          .select('*')
+          .limit(1);
 
-      if (cancelled) return;
+        if (cancelled) return;
 
-      if (error) {
-        console.error('[useSupabaseSettings] fetch error:', error.message);
-      } else if (rows && rows.length > 0) {
-        const row = rows[0];
-        setRowId(row.id);
-        setSettings({
-          schoolName: row.school_name || '',
-          directorName: row.director_name || '',
-          logo: row.logo || '/logo-light.png',
-          email: row.email || '',
-          phone: row.phone || '',
-          address: row.address || '',
-          currentSchoolYear: row.current_school_year || '2024-2025',
-        });
+        if (error) {
+          console.warn('[useSupabaseSettings] fetch error, fallback to localStorage:', error.message);
+          setSettings(getLocalBackup());
+        } else if (rows && rows.length > 0) {
+          const row = rows[0];
+          setRowId(row.id);
+          const loadedSettings: SchoolSettingsData = {
+            schoolName: row.school_name || '',
+            directorName: row.director_name || '',
+            logo: row.logo || '/logo-light.png',
+            email: row.email || '',
+            phone: row.phone || '',
+            address: row.address || '',
+            currentSchoolYear: row.current_school_year || '2024-2025',
+          };
+          setSettings(loadedSettings);
+          try {
+            localStorage.setItem(localKey, JSON.stringify(loadedSettings));
+          } catch {}
+        } else {
+          setSettings(getLocalBackup());
+        }
+      } catch {
+        if (!cancelled) setSettings(getLocalBackup());
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-      // Si aucune ligne, les valeurs par défaut restent
-      setLoading(false);
     };
 
     fetchSettings();
@@ -82,10 +103,13 @@ function useSupabaseSettings(): [
     };
   }, []);
 
-  // ─── Setter — sauvegarde en base ──────────────────────────────────────────
+  // ─── Setter — sauvegarde en base ET local ─────────────────────────────────
   const saveSettings = useCallback(
     async (data: SchoolSettingsData) => {
       setSettings(data);
+      try {
+        localStorage.setItem(localKey, JSON.stringify(data));
+      } catch {}
 
       const payload = {
         school_name: data.schoolName,
@@ -98,25 +122,29 @@ function useSupabaseSettings(): [
         updated_at: new Date().toISOString(),
       };
 
-      if (rowId) {
-        // Mise à jour de la ligne existante
-        const { error } = await supabase
-          .from('school_settings')
-          .update(payload)
-          .eq('id', rowId);
-        if (error) console.error('[useSupabaseSettings] update error:', error.message);
-      } else {
-        // Première insertion
-        const { data: inserted, error } = await supabase
-          .from('school_settings')
-          .insert(payload)
-          .select('id')
-          .single();
-        if (error) {
-          console.error('[useSupabaseSettings] insert error:', error.message);
-        } else if (inserted) {
-          setRowId(inserted.id);
+      try {
+        if (rowId) {
+          // Mise à jour de la ligne existante
+          const { error } = await supabase
+            .from('school_settings')
+            .update(payload)
+            .eq('id', rowId);
+          if (error) console.error('[useSupabaseSettings] update error:', error.message);
+        } else {
+          // Première insertion
+          const { data: inserted, error } = await supabase
+            .from('school_settings')
+            .insert(payload)
+            .select('id')
+            .single();
+          if (error) {
+            console.error('[useSupabaseSettings] insert error:', error.message);
+          } else if (inserted) {
+            setRowId(inserted.id);
+          }
         }
+      } catch (err) {
+        console.error('[useSupabaseSettings] exception:', err);
       }
     },
     [rowId]

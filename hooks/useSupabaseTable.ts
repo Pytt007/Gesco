@@ -4,54 +4,86 @@ import { supabase } from '../services/supabase';
 type WithId = { id: string };
 
 /**
- * Hook générique qui reproduit l'API de useLocalStorage<T[]> mais synchronise
- * avec une table Supabase.
- *
- * Structure attendue de la table :
- *   - id TEXT PRIMARY KEY
- *   - school_year TEXT
- *   - data JSONB
- *
- * Usage :
- *   const [students, setStudents, isLoading] = useSupabaseTable<Student>(
- *     'students', schoolYear
- *   );
+ * Hook générique qui synchronise avec Supabase ET maintient une copie locale dans localStorage
+ * pour garantir la persistance des données lors des rafraîchissements de page (F5),
+ * même en cas d'absence de connexion ou d'erreur RLS Supabase.
  */
 function useSupabaseTable<T extends WithId>(
   tableName: string,
   schoolYear: string,
   initialValue: T[] = []
 ): [T[], React.Dispatch<React.SetStateAction<T[]>>, boolean] {
-  const [data, setData] = useState<T[]>(initialValue);
-  const [loading, setLoading] = useState(true);
-  const prevDataRef = useRef<T[]>([]);
+  const localKey = `gesco_${tableName}_${schoolYear}`;
 
-  // ─── Chargement initial depuis Supabase ───────────────────────────────────
+  const getLocalBackup = useCallback((): T[] => {
+    try {
+      const saved = localStorage.getItem(localKey);
+      if (saved !== null) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (e) {
+      console.warn(`[useSupabaseTable] LocalStorage read error for "${tableName}":`, e);
+    }
+    return initialValue;
+  }, [localKey, initialValue]);
+
+  const [data, setData] = useState<T[]>(getLocalBackup);
+  const [loading, setLoading] = useState(true);
+  const prevDataRef = useRef<T[]>(data);
+
+  // ─── Chargement initial depuis Supabase avec fallback localStorage ───────
   useEffect(() => {
     let cancelled = false;
 
     const fetchData = async () => {
       setLoading(true);
-      const { data: rows, error } = await supabase
-        .from(tableName)
-        .select('id, data')
-        .eq('school_year', schoolYear)
-        .order('created_at', { ascending: true });
+      try {
+        const { data: rows, error } = await supabase
+          .from(tableName)
+          .select('id, data')
+          .eq('school_year', schoolYear)
+          .order('created_at', { ascending: true });
 
-      if (cancelled) return;
+        if (cancelled) return;
 
-      if (error) {
-        console.error(`[useSupabaseTable] Erreur chargement "${tableName}":`, error.message);
-        setData(initialValue);
-      } else {
-        const items = (rows || []).map((r: { id: string; data: T }) => ({
-          ...r.data,
-          id: r.id,
-        })) as T[];
-        setData(items);
-        prevDataRef.current = items;
+        if (error) {
+          console.warn(`[useSupabaseTable] Supabase fetch error for "${tableName}", fallback to localStorage:`, error.message);
+          const localData = getLocalBackup();
+          setData(localData);
+          prevDataRef.current = localData;
+        } else if (rows && rows.length > 0) {
+          const items = rows.map((r: { id: string; data: T }) => ({
+            ...r.data,
+            id: r.id,
+          })) as T[];
+          setData(items);
+          prevDataRef.current = items;
+          try {
+            localStorage.setItem(localKey, JSON.stringify(items));
+          } catch {}
+        } else {
+          // Si Supabase renvoie 0 ligne, vérifier si localStorage contient des données
+          const localData = getLocalBackup();
+          if (localData.length > 0) {
+            setData(localData);
+            prevDataRef.current = localData;
+            // Tenter d'envoyer les données locales vers Supabase
+            syncToSupabase(tableName, schoolYear, [], localData);
+          } else {
+            setData(initialValue);
+            prevDataRef.current = initialValue;
+          }
+        }
+      } catch (err) {
+        if (!cancelled) {
+          const localData = getLocalBackup();
+          setData(localData);
+          prevDataRef.current = localData;
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchData();
@@ -86,10 +118,9 @@ function useSupabaseTable<T extends WithId>(
       authSub.unsubscribe();
       supabase.removeChannel(channel);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tableName, schoolYear]);
+  }, [tableName, schoolYear, localKey, getLocalBackup, initialValue]);
 
-  // ─── Setter synchronisé avec Supabase ─────────────────────────────────────
+  // ─── Setter synchronisé avec localStorage ET Supabase ─────────────────────
   const setValue: React.Dispatch<React.SetStateAction<T[]>> = useCallback(
     (valueOrUpdater) => {
       setData((prev) => {
@@ -98,13 +129,20 @@ function useSupabaseTable<T extends WithId>(
             ? (valueOrUpdater as (p: T[]) => T[])(prev)
             : valueOrUpdater;
 
-        // Synchronisation asynchrone — ne bloque pas le rendu React
+        // 1. Sauvegarde Immédiate dans localStorage (instantané & persistant sur F5)
+        try {
+          localStorage.setItem(localKey, JSON.stringify(newValue));
+        } catch (e) {
+          console.error(`[useSupabaseTable] LocalStorage write error for "${tableName}":`, e);
+        }
+
+        // 2. Synchronisation asynchrone avec Supabase
         syncToSupabase(tableName, schoolYear, prev, newValue);
         prevDataRef.current = newValue;
         return newValue;
       });
     },
-    [tableName, schoolYear]
+    [tableName, schoolYear, localKey]
   );
 
   return [data, setValue, loading];
